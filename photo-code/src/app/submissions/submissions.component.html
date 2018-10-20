@@ -1,3 +1,71 @@
-<p>
-  submissions works!
-</p>
+<div class="subHeader">
+  <button class="uploadButton"
+          (click)="uploadSubmission()"
+          mat-button>
+  Upload New Submission
+  </button>
+  <h2>My Uploads</h2>
+</div>
+
+<div class="body">
+  <div class="filters">
+    <h3>Filters:</h3>
+    <hr/>
+    <form>
+        <div class="form-group">
+          Date:
+          <label for="fromdate">From</label>
+          <input type="date" 
+                 class="form-control" 
+                 id="fromdate" 
+                 name="fromdate" 
+                 [(ngModel)]="formData.fromdate">
+          <label for="todate">To</label>
+          <input type="date" 
+                 class="form-control" 
+                 id="todate" 
+                 name="todate" 
+                 [(ngModel)]="formData.todate">
+        </div>
+  
+        <div class="form-group">
+          <label for="language">Language</label>
+          <select id="langauge" 
+                  name="language"
+                  [(ngModel)]="formData.language">
+            <option *ngFor="let sl of supportedLanguages" 
+                    [value]='sl'>{{sl}}</option>
+          </select>
+        </div>
+  
+        <div class="form-group">
+          <label for="tags">Tags</label>
+          <input type="text" 
+                 class="form-control"  
+                 id="tags"
+                 name="tags"
+                 [(ngModel)]="formData.tags">
+        </div>
+      </form>
+  </div>
+  <div class="list">
+      <div *ngFor="let s of submissions"
+           class="subListItem"
+           (click)="selectedSubmission = s">
+        {{s.name}}
+      </div>
+  </div>
+  <div *ngIf="selectedSubmission"
+       class="submissionInfo">
+    <img src="{{selectedSubmission.image}}"
+         style="height: 40%"/>
+    <textarea class="codeInterpretation"
+              rows="6"
+              cols="30"
+              name="code"
+              [(ngModel)]="selectedSubmission.code"
+              style="height: 40%">
+    </textarea>
+    <p style="height: 20%">{{selectedSubmission.output}}</p>
+  </div>
+</div>
