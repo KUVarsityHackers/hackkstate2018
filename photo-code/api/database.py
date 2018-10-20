@@ -1,22 +1,19 @@
 from sqlite3 import Error, connect
+from bottle import get, post, delete, request, response, run
 from json import dumps
 
 database = "photo_code.db"
 
-def createTemplate(template_name, template_contents):
+@post('/createTemplate')
+def createTemplate():
     try:
         connection = connect(database)
     except Error:
-        return False
+        response.status = 500
+        return
 
-    cursor = connection.cursor()
-    cursor.execute("SELECT id FROM templates WHERE name = ?", [template_name])
-
-    nameExists = True if len(cursor.fetchall()) > 0 else False
-
-    if (nameExists):
-        connection.close()
-        return False
+    template_name = request.headers.get('template_name')
+    template_contents = request.headers.get('template_contents')
 
     cursor = connection.cursor()
 
@@ -24,18 +21,25 @@ def createTemplate(template_name, template_contents):
     connection.commit()
     connection.close()
 
-    return True
+    return dumps('Template Created Successfully')
 
-def createSubmission(template_id, submission_name, submission_string):
+
+@post('/createSubmission')
+def createSubmission():
     try:
         connection = connect(database)
     except Error:
-        return False
+        response.status = 500
+        return
+
+    template_id = request.headers.get('template_id')
+    submission_name = request.headers.get('submission_name')
+    submission_string = request.headers.get('submission_string')
 
     cursor = connection.cursor()
-    cursor.execute("SELECT id FROM templates WHERE id = ?", [template_id])
+    cursor.execute("SELECT count(*) FROM templates WHERE id = ?", [template_id])
 
-    templateExists = True if len(cursor.fetchall()) == 1 else False;
+    templateExists = True if len(cursor.fetchall()) == 1 else False
 
     if (templateExists == False):
         connection.close()
@@ -47,14 +51,18 @@ def createSubmission(template_id, submission_name, submission_string):
     connection.commit()
     connection.close()
 
-    return True
+    return dumps('Submission created successfully')
 
 
-def deleteTemplate(template_id):
+@delete('/deleteTemplate')
+def deleteTemplate():
     try:
         connection = connect(database)
     except Error:
-        return False
+        response.status = 500
+        return
+
+    template_id = request.headers.get('template_id')
 
     cursor = connection.cursor()
 
@@ -63,14 +71,18 @@ def deleteTemplate(template_id):
     connection.commit()
     connection.close()
 
-    return True
+    return dumps('Template deleted successfully')
 
 
-def deleteSubmission(submission_id):
+@delete('/deleteSubmission')
+def deleteSubmission():
     try:
         connection = connect(database)
     except Error:
-        return False
+        response.status = 500
+        return
+
+    submission_id = request.headers.get('submission_id')
 
     cursor = connection.cursor()
 
@@ -78,17 +90,21 @@ def deleteSubmission(submission_id):
     connection.commit()
     connection.close()
 
-    return True
+    return dumps('Submission deleted successfully')
 
 
-def getTemplate(template_id):
+@get('/getTemplate')
+def getTemplate():
     try:
         connection = connect(database)
     except Error:
-        return False
+        response.status = 500
+        return
+
+    template_id = request.headers.get('template_id')
 
     cursor = connection.cursor()
-    cursor.execute("SELECT name, content FROM templates WHERE id = ?", [template_id])
+    cursor.execute("SELECT id, name, content FROM templates WHERE id = ?", [template_id])
 
     rows = cursor.fetchall()
     connection.close()
@@ -96,32 +112,21 @@ def getTemplate(template_id):
     return dumps(rows)
 
 
-def getSubmissions(template_id):
+@get('/getSubmissions')
+def getSubmissions():
     try:
         connection = connect(database)
     except Error:
         return False
 
+    template_id = request.headers.get('template_id')
+
     cursor = connection.cursor()
-    cursor.execute("SELECT name, content FROM submissions WHERE template_id = ?", [template_id])
+    cursor.execute("SELECT id, name, content FROM submissions WHERE template_id = ?", [template_id])
 
     rows = cursor.fetchall()
     connection.close()
 
     return dumps(rows)
 
-
-def main():
-    deleteTemplate(2)
-    createTemplate('Testing Template', 'Testing Template Contents')
-    createSubmission(2, 'Daniel', 'Daniel Test')
-    createSubmission(2, 'Colin', 'Colin Test')
-    createSubmission(2, 'Nathan', 'Nathan Test')
-    createSubmission(2, 'Andre', 'Andre Test')
-    print(getTemplate(2))
-    print(getSubmissions(2))
-    deleteTemplate(2)
-
-
-if __name__ == '__main__':
-    main()
+run(host='localhost', port=8080, debug=True)
