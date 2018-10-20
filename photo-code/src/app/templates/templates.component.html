@@ -1,0 +1,66 @@
+<div class="subHeader">
+  <button class="createButton"
+          (click)="createTemplate()"
+          mat-button>
+  Build New Template
+  </button>
+  <h2>My Templates</h2>
+</div>
+
+<div class="body">
+  <div class="list">
+      <h2>Templates:</h2>
+      <div class="listItem"
+           *ngFor="let template of templates"
+           (click)="selectedTemplate = template">
+        {{ template.name }}
+      </div>
+  </div>
+
+  <div class="form" *ngIf="selectedTemplate">
+      <h1>Template Info</h1>
+      <form>
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" 
+                 class="form-control" 
+                 id="name" 
+                 name="name" 
+                 [(ngModel)]="selectedTemplate.name" 
+                 required>
+        </div>
+  
+        <div class="form-group">
+          <label for="language">Language</label>
+          <select id="langauge" 
+                  name="language"
+                  [(ngModel)]="selectedTemplate.language" 
+                  required>
+            <option *ngFor="let sl of supportedLanguages" 
+                    [value]='sl'>{{sl}}</option>
+          </select>
+        </div>
+   
+        <div class="form-group">
+          <label for="code">Code Template</label>
+          <textarea class="form-control" 
+                    rows="6"
+                    cols="30"
+                    id="code" 
+                    name="code"
+                    [(ngModel)]="selectedTemplate.code" 
+                    required>
+          </textarea>
+        </div>
+  
+        <div class="form-group">
+          <label for="output">Expected Output</label>
+          <input type="text" 
+                 class="form-control"  
+                 id="output"
+                 name="output"
+                 [(ngModel)]="selectedTemplate.output">
+        </div>
+      </form>
+  </div>
+</div>
