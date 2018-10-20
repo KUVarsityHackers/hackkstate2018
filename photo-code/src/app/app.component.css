@@ -1,0 +1,13 @@
+.header{
+    width: 100%;
+    background-color: steelblue;
+    border-bottom-color: darkslategray;
+    color: darkslategray;
+    text-align:center
+}
+
+h1 {
+    margin: 0;
+    padding: 20px;
+}
+
