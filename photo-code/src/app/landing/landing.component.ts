@@ -15,11 +15,11 @@ export class LandingComponent implements OnInit {
   isActive = false;
   isActive2 = false;
 
-  manageTemplates() {
-    alert("Managing Templates");
-  }
+  // manageTemplates() {
+  //   alert("Managing Templates");
+  // }
 
-  viewSubmissions() {
-    alert("Viewing Submissions");
-  }
+  // viewSubmissions() {
+  //   alert("Viewing Submissions");
+  // }
 }
