@@ -1,25 +1,28 @@
 from sqlite3 import Error, connect
 from flask import Flask, request, abort
+from flask_cors import CORS, cross_origin
+from flask_restful import Resource, Api
 from json import dumps
 #from image_processing.py import convert_detect
 
 app = Flask(__name__)
+CORS(app)
 
 database = "photo_code.db"
 
-@app.route('/templates', methods=['GET', 'POST', 'DELETE'])
+@app.route('/api/templates', methods=['GET', 'POST', 'DELETE'])
 def template():
     try:
         connection = connect(database)
     except Error:
         abort(500)
-
+    print(request.data)
     if request.method == 'GET':
-        if hasattr(request.headers, 'template_id'):
-            template_id = request.headers['template_id']
+        if hasattr(request.headers, 'tempId'):
+            tempId = request.headers['tempId']
 
             cursor = connection.cursor()
-            cursor.execute("SELECT id, name, content FROM templates WHERE id = ?", [template_id])
+            cursor.execute("SELECT id, name, content FROM templates WHERE id = ?", [tempId])
         else:
             cursor = connection.cursor()
             cursor.execute('SELECT id, name, content FROM templates')
@@ -29,30 +32,30 @@ def template():
 
         return dumps(rows)
     elif request.method == 'POST':
-        template_name = request.headers['template_name']
-        template_contents = request.headers['template_contents']
+        name = request.headers['name']
+        content = request.headers['content']
 
         cursor = connection.cursor()
 
-        cursor.execute("INSERT INTO templates (name, content) VALUES (?, ?)", (template_name, template_contents))
+        cursor.execute("INSERT INTO templates (name, content) VALUES (?, ?)", (name, content))
         connection.commit()
         connection.close()
 
         return 'Success'
     elif request.method == 'DELETE':
-        template_id = request.headers['template_id']
+        tempId = request.headers['tempId']
 
         cursor = connection.cursor()
 
-        cursor.execute("DELETE FROM templates WHERE id = ?", [template_id])
-        cursor.execute("DELETE FROM submissions WHERE template_id = ?", [template_id])
+        cursor.execute("DELETE FROM templates WHERE id = ?", [tempId])
+        cursor.execute("DELETE FROM submissions WHERE template_id = ?", [tempId])
         connection.commit()
         connection.close()
 
         return 'Success'
 
 
-@app.route('/submissions', methods=['GET', 'POST', 'DELETE'])
+@app.route('/api/submissions', methods=['GET', 'POST', 'DELETE'])
 def submission():
     try:
         connection = connect(database)
@@ -60,22 +63,22 @@ def submission():
         abort(500)
 
     if request.method == 'GET':
-        template_id = request.headers['template_id']
+        tempId = request.headers['tempId']
 
         cursor = connection.cursor()
-        cursor.execute("SELECT id, name, content FROM submissions WHERE template_id = ?", [template_id])
+        cursor.execute("SELECT id, name, content FROM submissions WHERE template_id = ?", [tempId])
 
         rows = cursor.fetchall()
         connection.close()
 
         return dumps(rows)
     elif request.method == 'POST':
-        template_id = request.headers['template_id']
+        tempId = request.headers['tempId']
         submission_name = request.headers['submission_name']
         submission_content = request.headers['submission_content']
 
         cursor = connection.cursor()
-        cursor.execute("SELECT count(*) FROM templates WHERE id = ?", [template_id])
+        cursor.execute("SELECT count(*) FROM templates WHERE id = ?", [tempId])
 
         templateExists = True if len(cursor.fetchall()) == 1 else False
 
@@ -85,7 +88,7 @@ def submission():
 
         cursor = connection.cursor()
 
-        cursor.execute("INSERT INTO submissions (template_id, name, content) VALUES (?, ?, ?)", (template_id, submission_name, submission_content))
+        cursor.execute("INSERT INTO submissions (template_id, name, content) VALUES (?, ?, ?)", (tempId, submission_name, submission_content))
         connection.commit()
         connection.close()
 
@@ -111,4 +114,4 @@ def ocr():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port=8080, debug=True)
