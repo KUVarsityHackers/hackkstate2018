@@ -8,7 +8,7 @@ export class TemplatesService {
   constructor(private http: HttpClient) { }
 
   getAllTemplates(){
-    return this.http.get<Template[]>("/api/templates");
+    return this.http.get<Template[]>("http://photocode.net/api/templates");
   }
 
   postTemplate(tem: Template){
@@ -16,6 +16,6 @@ export class TemplatesService {
         template_name: tem.name,
         template_content: tem.content
       }
-      this.http.post("/api/templates", body);
+      this.http.post("http://photocode.net/api/templates", body);
   }
 }

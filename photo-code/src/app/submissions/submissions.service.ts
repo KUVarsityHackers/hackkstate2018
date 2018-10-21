@@ -9,11 +9,11 @@ export class SubmissionsService {
   constructor(private http: HttpClient) { }
 
   getSubmissionResponse(){
-    return this.http.get<Submission[]>("/api/submissions");
+    return this.http.get<Submission[]>("http://photocode.net/api/submissions");
   }
 
   getAllTemplates(){
-    return this.http.get<Template[]>("/api/templates");
+    return this.http.get<Template[]>("http://photocode.net/api/templates");
   }
 
   postSubmission(sub: Submission){
@@ -23,7 +23,7 @@ export class SubmissionsService {
         submission_content: sub.code
 
       }
-      this.http.post("/api/submissions", body);
+      this.http.post("http://photocode.net/api/submissions", body);
   }
 
   getCodeResponse(Submission){
@@ -43,7 +43,7 @@ export class SubmissionsService {
         b64: image[3],
         fileName: image[1]
     }
-    let response = this.http.post<string>('/api/OCR', body); 
+    let response = this.http.post<string>('http://photocode.net/api/OCR', body); 
     return response;
   }
 }

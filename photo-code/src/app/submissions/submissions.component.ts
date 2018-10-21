@@ -76,10 +76,12 @@ export class UploadDialog {
     this.dialogRef.close();
   }
 
-  onConfirm(submission): void {
+  onConfirm(submission: Submission): void {
     //Add API Call to read image from submission.image
     this.subService.getImageCode(this.submission.image).subscribe(out => this.submission.code = out);
     //this.submission.code = '#include<iostream>\nint main(){std::cout << "Hi" << std::endl;return 0;}';
+    let template: Template = this.templates.find(t => t.templateID == submission.templateID);
+    this.submission.code = template.content.replace("[PHOTOCODE REPLACE]", this.submission.code);
     this.submission.name += "'s Submission";
     this.dialogRef.close();
   }
