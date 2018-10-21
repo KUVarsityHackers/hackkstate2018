@@ -1,0 +1,13 @@
+<h1 mat-dialog-title>Upload Image</h1>
+<div mat-dialog-content>
+  <p>What is your name?</p>
+  <mat-form-field>
+    <input matInput [(ngModel)]="submission.name">
+  </mat-form-field>
+  <p>Please choose a file to upload</p>
+  <input type="file" accept="image/*" (change)="onFileChanged($event)">
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button (click)="onConfirm(submission)" cdkFocusInitial>Upload</button>
+</div>
