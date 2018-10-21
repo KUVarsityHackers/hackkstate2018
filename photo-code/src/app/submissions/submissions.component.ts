@@ -13,6 +13,7 @@ export class SubmissionsComponent implements OnInit {
   supportedLanguages: String[] = ['C++', 'Java'];
   submissions: Submission[] = [];
   selectedSubmission: Submission;
+  templates: Template[] = [];
   formData: any = {
     fromdate: Date,
     todate: Date,
@@ -25,6 +26,25 @@ export class SubmissionsComponent implements OnInit {
     public subService: SubmissionsService) { }
 
   ngOnInit() {
+    this.subService.getAllTemplates().subscribe(out => {
+      out.forEach(arr => {
+        let t = new Template();
+        t.templateID = arr[0];
+        t.name = arr[1];
+        t.content = arr[2];
+        this.templates.push(t);
+      })
+    });
+    this.templates.forEach(t => {
+      this.subService.getSubmissionResponse(t.templateID).subscribe(out => {
+        out.forEach(arr => {
+          let s = new Submission();
+          s.name = arr[1];
+          s.code = arr[2];
+          this.submissions.push(s);
+        })
+      })
+    });
   }
 
   uploadSubmission() {
@@ -52,7 +72,7 @@ export class SubmissionsComponent implements OnInit {
   templateUrl: 'upload-dialog.html',
 })
 export class UploadDialog {
-  templates: Template[];
+  templates: Template[] = [];
 
   constructor(
     public dialogRef: MatDialogRef<UploadDialog>,
@@ -60,7 +80,15 @@ export class UploadDialog {
     @Inject(MAT_DIALOG_DATA) public submission: Submission) {}
 
   ngOnInit(){
-    this.subService.getAllTemplates().subscribe(out => this.templates = out);
+    this.subService.getAllTemplates().subscribe(out => {
+      out.forEach(arr => {
+        let t = new Template();
+        t.templateID = arr[0];
+        t.name = arr[1];
+        t.content = arr[2];
+        this.templates.push(t);
+      })
+    });
   }
 
   onFileChanged(event): void {
@@ -79,7 +107,6 @@ export class UploadDialog {
   onConfirm(submission: Submission): void {
     //Add API Call to read image from submission.image
     this.subService.getImageCode(this.submission.image).subscribe(out => this.submission.code = out);
-    //this.submission.code = '#include<iostream>\nint main(){std::cout << "Hi" << std::endl;return 0;}';
     let template: Template = this.templates.find(t => t.templateID == submission.templateID);
     this.submission.code = template.content.replace("[PHOTOCODE REPLACE]", this.submission.code);
     this.submission.name += "'s Submission";
