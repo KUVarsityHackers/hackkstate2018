@@ -1,4 +1,4 @@
 # hackkstate2018
-
-Code Classroom
+photoCode
+View the devpost: https://devpost.com/software/photocode
 

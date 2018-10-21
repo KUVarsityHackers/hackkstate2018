@@ -13,9 +13,9 @@ export class TemplatesService {
 
   postTemplate(tem: Template){
       let body = {
-        template_name: tem.name,
-        template_content: tem.content
+        't_name': tem.name,
+        't_content': tem.content
       }
-      this.http.post("http://photocode.net:8080/api/templates", body);
+      return this.http.post("http://photocode.net:8080/api/templates", body);
   }
 }
