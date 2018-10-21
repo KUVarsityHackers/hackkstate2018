@@ -1,6 +1,7 @@
 from sqlite3 import Error, connect
-from flask import Flask, request
+from flask import Flask, request, abort
 from json import dumps
+#from image_processing.py import convert_detect
 
 app = Flask(__name__)
 
@@ -11,14 +12,17 @@ def template():
     try:
         connection = connect(database)
     except Error:
-        response.status = 500
-        return
+        abort(500)
 
     if request.method == 'GET':
-        template_id = request.headers['template_id']
+        if hasattr(request.headers, 'template_id'):
+            template_id = request.headers['template_id']
 
-        cursor = connection.cursor()
-        cursor.execute("SELECT id, name, content FROM templates WHERE id = ?", [template_id])
+            cursor = connection.cursor()
+            cursor.execute("SELECT id, name, content FROM templates WHERE id = ?", [template_id])
+        else:
+            cursor = connection.cursor()
+            cursor.execute('SELECT id, name, content FROM templates')
 
         rows = cursor.fetchall()
         connection.close()
@@ -34,7 +38,7 @@ def template():
         connection.commit()
         connection.close()
 
-        return dumps('Template Created Successfully')
+        return 'Success'
     elif request.method == 'DELETE':
         template_id = request.headers['template_id']
 
@@ -45,7 +49,7 @@ def template():
         connection.commit()
         connection.close()
 
-        return dumps('Template deleted successfully')
+        return 'Success'
 
 
 @app.route('/submissions', methods=['GET', 'POST', 'DELETE'])
@@ -53,7 +57,8 @@ def submission():
     try:
         connection = connect(database)
     except Error:
-        return False
+        abort(500)
+
     if request.method == 'GET':
         template_id = request.headers['template_id']
 
@@ -75,8 +80,8 @@ def submission():
         templateExists = True if len(cursor.fetchall()) == 1 else False
 
         if (templateExists == False):
+            abort(500)
             connection.close()
-            # return False
 
         cursor = connection.cursor()
 
@@ -84,7 +89,7 @@ def submission():
         connection.commit()
         connection.close()
 
-        return dumps('Submission created successfully')
+        return 'Success'
     elif request.method == 'DELETE':
         submission_id = request.headers['submission_id']
 
@@ -94,7 +99,15 @@ def submission():
         connection.commit()
         connection.close()
 
-        return dumps('Submission deleted successfully')
+        return 'Success'
+
+@app.route('/OCR', methods=['POST'])
+def ocr():
+    picture = request.form['b64']
+    fileName = request.form['fileName']
+
+    return dumps(convert_detect(picture, fileName, True))
+
 
 
 if __name__ == '__main__':

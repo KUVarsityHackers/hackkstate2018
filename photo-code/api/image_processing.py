@@ -22,7 +22,7 @@ def convert_detect(image_64_encode, filename="temp.jpg", convert=False):
     path = "temp" + file_extension
     import base64
     image_64_decode = base64.decodestring(image_64_encode)
-    image_result = open(path, 'wb') 
+    image_result = open(path, 'wb')
     # create a writable image and write the decoding result
     image_result.write(image_64_decode)
     image_result.close()
@@ -36,15 +36,14 @@ def convert_detect(image_64_encode, filename="temp.jpg", convert=False):
         img = cv2.erode(img, kernel, iterations=1)
         cv2.imwrite(new_path, img)
         path = new_path
-    
+
     code = detect_text(path)
 
     f = open("tempc.cpp","w+")
     f.write(code)
     f.close()
-    bashCommand = "clang-format tempc.cpp" 
+    bashCommand = "clang-format tempc.cpp"
     import subprocess
     process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
     return output.decode("utf-8")
-
