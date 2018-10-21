@@ -2,15 +2,28 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { Submission } from './Submission';
+import { Template } from '../templates/template';
 
 @Injectable()
 export class SubmissionsService {
   constructor(private http: HttpClient) { }
 
-  subURL: string = 'api/submission';
-
   getSubmissionResponse(){
-    this.http.get<Submission[]>(this.subURL);
+    return this.http.get<Submission[]>("http://photocode.net:8080/api/submissions");
+  }
+
+  getAllTemplates(){
+    return this.http.get<Template[]>("http://photocode.net:8080/api/templates");
+  }
+
+  postSubmission(sub: Submission){
+      let body = {
+        template_id: sub.templateID,
+        submission_name: sub.name,
+        submission_content: sub.code
+
+      }
+      this.http.post("http://photocode.net:8080/api/submissions", body);
   }
 
   getCodeResponse(Submission){
@@ -30,7 +43,7 @@ export class SubmissionsService {
         b64: image[3],
         fileName: image[1]
     }
-    let response = this.http.post<string>('api/image', body); 
+    let response = this.http.post<string>('http://photocode.net:8080/api/OCR', body); 
     return response;
   }
 }

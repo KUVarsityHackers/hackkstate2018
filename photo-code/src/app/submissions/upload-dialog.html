@@ -6,6 +6,13 @@
   </mat-form-field>
   <p>Please choose a file to upload</p>
   <input type="file" accept="image/*" (change)="onFileChanged($event)">
+  <p>What template would you like applied?</p>
+  <select id="temp" 
+          name="temp"
+          [(ngModel)]="submission.templateID">
+          <option *ngFor="let t of templates" 
+                  [value]='t.templateID'>{{t.name}}</option>
+  </select>
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Cancel</button>

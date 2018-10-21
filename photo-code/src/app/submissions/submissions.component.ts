@@ -2,6 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import { SubmissionsService } from './submissions.service';
 import { Submission } from './Submission';
+import { Template } from '../templates/template';
 
 @Component({
   selector: 'app-submissions',
@@ -38,32 +39,10 @@ export class SubmissionsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
+      this.subService.postSubmission(s);
       this.subService.getCodeResponse(s).subscribe(out => s.output = out);
     });
-
   }
-	
-	// CompileAndRun(args: String = ''){
-	// 	let request = require('request');
-
-	// 	let program = {
-	// 		script : args,
-	// 		language: "cpp14",
-	// 		versionIndex: "2",
-	// 		clientId: "43540fa13cb920a980bb8011740ba63f",
-	// 		clientSecret:"463414f3fccd12261c2afcff044d17937207c1f8c1c1b60a3ee181b314c6cfda"
-	// 	};
-	// 	request({
-	// 		url: 'https://api.jdoodle.com/execute',
-	// 		method: "POST",
-	// 		json: program
-	// 		},
-	// 	function (error, response, body) {
-	// 		let recBody = body;
-			
-	// 	});
-	// }
-
 }
 
 
@@ -73,11 +52,16 @@ export class SubmissionsComponent implements OnInit {
   templateUrl: 'upload-dialog.html',
 })
 export class UploadDialog {
+  templates: Template[];
 
   constructor(
     public dialogRef: MatDialogRef<UploadDialog>,
     public subService: SubmissionsService,
     @Inject(MAT_DIALOG_DATA) public submission: Submission) {}
+
+  ngOnInit(){
+    this.subService.getAllTemplates().subscribe(out => this.templates = out);
+  }
 
   onFileChanged(event): void {
     const file = event.target.files[0];
@@ -92,10 +76,12 @@ export class UploadDialog {
     this.dialogRef.close();
   }
 
-  onConfirm(submission): void {
+  onConfirm(submission: Submission): void {
     //Add API Call to read image from submission.image
     this.subService.getImageCode(this.submission.image).subscribe(out => this.submission.code = out);
     //this.submission.code = '#include<iostream>\nint main(){std::cout << "Hi" << std::endl;return 0;}';
+    let template: Template = this.templates.find(t => t.templateID == submission.templateID);
+    this.submission.code = template.content.replace("[PHOTOCODE REPLACE]", this.submission.code);
     this.submission.name += "'s Submission";
     this.dialogRef.close();
   }
