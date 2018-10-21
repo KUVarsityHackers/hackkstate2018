@@ -10,6 +10,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule, MatCardModule, MatDialogModule, MatFormFieldModule, MatInputModule } from '@angular/material';
 import { LandingComponent } from './landing/landing.component';
 import { TemplatesComponent } from './templates/templates.component';
+import { TemplatesService } from './templates/templates.service';
 import { SubmissionsComponent, UploadDialog } from './submissions/submissions.component';
 import { SubmissionsService } from './submissions/submissions.service';
 
@@ -34,7 +35,8 @@ import { SubmissionsService } from './submissions/submissions.service';
     MatInputModule
   ],
   providers: [
-    SubmissionsService
+    SubmissionsService,
+    TemplatesService
   ],
   bootstrap: [AppComponent],
   entryComponents: [UploadDialog]
