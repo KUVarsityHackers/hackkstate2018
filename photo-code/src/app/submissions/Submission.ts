@@ -1,6 +1,6 @@
 export class Submission {
     image;
-    code: String;
+    code: string;
     output: String;
     name: String;
     templateID: number;
