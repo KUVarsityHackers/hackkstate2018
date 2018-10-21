@@ -2,6 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 import { SubmissionsService } from './submissions.service';
 import { Submission } from './Submission';
+import { Template } from '../templates/template';
 
 @Component({
   selector: 'app-submissions',
@@ -38,6 +39,7 @@ export class SubmissionsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
+      this.subService.postSubmission(s);
       this.subService.getCodeResponse(s).subscribe(out => s.output = out);
     });
 
@@ -73,11 +75,16 @@ export class SubmissionsComponent implements OnInit {
   templateUrl: 'upload-dialog.html',
 })
 export class UploadDialog {
+  templates: Template[];
 
   constructor(
     public dialogRef: MatDialogRef<UploadDialog>,
     public subService: SubmissionsService,
     @Inject(MAT_DIALOG_DATA) public submission: Submission) {}
+
+  ngOnInit(){
+    this.subService.getAllTemplates().subscribe(out => this.templates = out);
+  }
 
   onFileChanged(event): void {
     const file = event.target.files[0];

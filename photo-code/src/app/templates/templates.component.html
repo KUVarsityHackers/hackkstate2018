@@ -1,6 +1,6 @@
 <div class="subHeader">
   <button class="createButton"
-          (click)="createTemplate()"
+          (click)="selectNewTemplate()"
           mat-button>
   Build New Template
   </button>
@@ -48,7 +48,7 @@
                     cols="30"
                     id="code" 
                     name="code"
-                    [(ngModel)]="selectedTemplate.code" 
+                    [(ngModel)]="selectedTemplate.content" 
                     required>
           </textarea>
         </div>
@@ -61,6 +61,9 @@
                  name="output"
                  [(ngModel)]="selectedTemplate.output">
         </div>
+
+        <button mat-button
+                (click)="createTemplate(selectedTemplate)">Save</button>
       </form>
   </div>
 </div>

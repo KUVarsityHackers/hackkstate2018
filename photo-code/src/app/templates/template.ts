@@ -1,13 +1,14 @@
 export class Template {
+    templateID: number;
     name: String;
+    content: String;
     language: String;
-    code: String;
     output: String;
 
     constructor(){
         this.name = "name";
         this.language = "C++";
-        this.code = 
+        this.content = 
 `int main(){
     [PHOTOCODE REPLACE]
     return 0;
