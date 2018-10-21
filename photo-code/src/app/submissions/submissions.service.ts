@@ -40,12 +40,15 @@ export class SubmissionsService {
     return response;
   }
 
-  getImageCode(image){
+  getImageCode(image: string){
+    let headers: Headers = new Headers();
+    headers.append("b64", image.substr(image.indexOf("/9")));
+    headers.append("fileName", "temp." + image.substring(image.indexOf("/") + 1, image.indexOf(";")))
     let body = {
-        b64: image[3],
-        fileName: image[1]
+        b64: image.substr(image.indexOf("/9")),
+        fileName: "temp." + image.substring(image.indexOf("/") + 1, image.indexOf(";"))
     }
-    let response = this.http.post<string>('http://photocode.net:8080/api/OCR', body); 
+    let response = this.http.post<string>('http://photocode.net:8080/OCR', body); 
     return response;
   }
 }

@@ -73,6 +73,9 @@ export class SubmissionsComponent implements OnInit {
 })
 export class UploadDialog {
   templates: Template[] = [];
+  code: string = `int main(){
+    std::cout << 
+  }`
 
   constructor(
     public dialogRef: MatDialogRef<UploadDialog>,
@@ -106,9 +109,8 @@ export class UploadDialog {
 
   onConfirm(submission: Submission): void {
     //Add API Call to read image from submission.image
-    this.subService.getImageCode(this.submission.image).subscribe(out => this.submission.code = out);
-    let template: Template = this.templates.find(t => t.templateID == submission.templateID);
-    this.submission.code = template.content.replace("[PHOTOCODE REPLACE]", this.submission.code);
+    let obs = this.subService.getImageCode(this.submission.image);
+    let response = obs.subscribe(out => this.submission.code = out);
     this.submission.name += "'s Submission";
     this.dialogRef.close();
   }
