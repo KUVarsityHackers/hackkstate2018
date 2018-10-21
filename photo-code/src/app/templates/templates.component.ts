@@ -20,7 +20,15 @@ export class TemplatesComponent implements OnInit {
   }
 
   getTemplates() {
-    this.tempService.getAllTemplates().subscribe(out => this.templates = out);
+    this.tempService.getAllTemplates().subscribe(out => {
+      out.forEach(arr => {
+        let t = new Template();
+        t.templateID = arr[0];
+        t.name = arr[1];
+        t.content = arr[2];
+        this.templates.push(t);
+      })
+    });
   }
 
   selectNewTemplate(){
@@ -29,7 +37,7 @@ export class TemplatesComponent implements OnInit {
   }
 
   createTemplate(template: Template){
-    this.tempService.postTemplate(template);
-    this.getTemplates();
+    this.tempService.postTemplate(template).subscribe((out: number) => template.templateID = out);
+    this.templates.push(template);
   }
 }

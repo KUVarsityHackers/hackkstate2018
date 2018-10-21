@@ -1,7 +1,7 @@
 export class Template {
     templateID: number;
-    name: String;
-    content: String;
+    name: string;
+    content: string;
     language: String;
     output: String;
 

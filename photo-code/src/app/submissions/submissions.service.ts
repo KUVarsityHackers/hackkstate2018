@@ -8,7 +8,9 @@ import { Template } from '../templates/template';
 export class SubmissionsService {
   constructor(private http: HttpClient) { }
 
-  getSubmissionResponse(){
+  getSubmissionResponse(templateID: number){
+    let headers: Headers = new Headers();
+    headers.append('tempId', templateID.toString());
     return this.http.get<Submission[]>("http://photocode.net:8080/api/submissions");
   }
 
@@ -23,7 +25,7 @@ export class SubmissionsService {
         submission_content: sub.code
 
       }
-      this.http.post("http://photocode.net:8080/api/submissions", body);
+      return this.http.post("http://photocode.net:8080/api/submissions", body);
   }
 
   getCodeResponse(Submission){
