@@ -3,6 +3,9 @@
 #ignore database files
 *.db
 
+#ignore npm log
+npm-debug.log
+
 # compiled output
 /dist
 /tmp

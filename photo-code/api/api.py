@@ -2,7 +2,7 @@ from sqlite3 import Error, connect
 from flask import Flask, request, abort
 from flask_cors import CORS, cross_origin
 from flask_restful import Resource, Api
-from json import dumps
+from json import dumps, loads
 from image_processing import convert_detect
 
 app = Flask(__name__)
@@ -16,7 +16,7 @@ def templates():
         con = connect(database)
     except Error:
         abort(500)
-    print(request.data)
+    
     if request.method == 'GET':
         if hasattr(request.headers, 'tempId'):
             tempId = request.headers['tempId']
@@ -32,9 +32,9 @@ def templates():
 
         return dumps(rows)
     elif request.method == 'POST':
-        name = request.values['t_name']
-        content = request.values['t_content']
-
+        data = loads(request.data.decode('utf-8'))
+        name = data['t_name']
+        content = data['t_content']
         cursor = con.cursor()
 
         cursor.execute("INSERT INTO templates (name, content) VALUES (?, ?)", (name, content))
@@ -50,22 +50,22 @@ def submission():
         connection = connect(database)
     except Error:
         abort(500)
-
+    
     if request.method == 'GET':
-        tempId = request.headers['tempId']
+        #tempId = request.headers['tempId']
 
         cursor = connection.cursor()
-        cursor.execute("SELECT id, name, content FROM submissions WHERE template_id = ?", [tempId])
+        cursor.execute("SELECT id, name, content FROM submissions")
 
         rows = cursor.fetchall()
         connection.close()
 
         return dumps(rows)
     elif request.method == 'POST':
-        tempId = request.headers['tempId']
-        submission_name = request.headers['submission_name']
-        submission_content = request.headers['submission_content']
-
+        data = loads(request.data.decode('utf-8'))
+        tempId = data['tempId']
+        submission_name = data['submission_name']
+        submission_content = data['submission_content']
         cursor = connection.cursor()
         cursor.execute("SELECT count(*) FROM templates WHERE id = ?", [tempId])
 
@@ -78,31 +78,21 @@ def submission():
         cursor = connection.cursor()
 
         cursor.execute("INSERT INTO submissions (template_id, name, content) VALUES (?, ?, ?)", (tempId, submission_name, submission_content))
+        cursor.execute('Select max(id) from submissions')
+        answer = cursor.fetchall()
         connection.commit()
         connection.close()
 
-        return 'Success'
-    elif request.method == 'DELETE':
-        submission_id = request.headers['submission_id']
-
-        cursor = connection.cursor()
-
-        cursor.execute("DELETE FROM submissions WHERE id = ?", [submission_id])
-        connection.commit()
-        connection.close()
-
-        return 'Success'
+        return dumps(answer)
 
 @app.route('/OCR', methods=['POST'])
 def ocr():
-    print(request.values)
-    picture = request.values['b64']
-    fileName = request.values['fileName']
+    data = loads(request.data.decode('utf-8'))
+    picture = data['b64']
+    fileName = data['fileName']
     
     return dumps(convert_detect(picture.encode(), fileName, True))
 
 
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug = True)
-
+    app.run(host='0.0.0.0', port=8080)
