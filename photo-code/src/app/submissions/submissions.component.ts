@@ -35,8 +35,8 @@ export class SubmissionsComponent implements OnInit {
         this.templates.push(t);
       })
     });
-    this.templates.forEach(t => {
-      this.subService.getSubmissionResponse(t.templateID).subscribe(out => {
+    let r = this.subService.getSubmissionResponse(1);
+    r.subscribe(out => {
         out.forEach(arr => {
           let s = new Submission();
           s.name = arr[1];
@@ -44,7 +44,7 @@ export class SubmissionsComponent implements OnInit {
           this.submissions.push(s);
         })
       })
-    });
+    
   }
 
   uploadSubmission() {
@@ -59,7 +59,6 @@ export class SubmissionsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
-      this.subService.postSubmission(s);
       this.subService.getCodeResponse(s).subscribe(out => s.output = out);
     });
   }
@@ -112,6 +111,8 @@ export class UploadDialog {
     let obs = this.subService.getImageCode(this.submission.image);
     let response = obs.subscribe(out => this.submission.code = out);
     this.submission.name += "'s Submission";
+    let r;
+    this.subService.postSubmission(submission).subscribe(out => r = out);
     this.dialogRef.close();
   }
 }
