@@ -3,17 +3,17 @@ from flask import Flask, request, abort
 from flask_cors import CORS, cross_origin
 from flask_restful import Resource, Api
 from json import dumps
-#from image_processing.py import convert_detect
+from image_processing import convert_detect
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"*": {"origins": "*"}})
 
 database = "photo_code.db"
 
-@app.route('/api/templates', methods=['GET', 'POST', 'DELETE'])
-def template():
+@app.route('/api/templates', methods=['GET', 'POST'])
+def templates():
     try:
-        connection = connect(database)
+        con = connect(database)
     except Error:
         abort(500)
     print(request.data)
@@ -21,41 +21,30 @@ def template():
         if hasattr(request.headers, 'tempId'):
             tempId = request.headers['tempId']
 
-            cursor = connection.cursor()
+            cursor = con.cursor()
             cursor.execute("SELECT id, name, content FROM templates WHERE id = ?", [tempId])
         else:
-            cursor = connection.cursor()
+            cursor = con.cursor()
             cursor.execute('SELECT id, name, content FROM templates')
 
         rows = cursor.fetchall()
-        connection.close()
+        con.close()
 
         return dumps(rows)
     elif request.method == 'POST':
-        name = request.headers['name']
-        content = request.headers['content']
+        name = request.values['t_name']
+        content = request.values['t_content']
 
-        cursor = connection.cursor()
+        cursor = con.cursor()
 
         cursor.execute("INSERT INTO templates (name, content) VALUES (?, ?)", (name, content))
-        connection.commit()
-        connection.close()
+        con.commit()
+        con.close()
 
-        return 'Success'
-    elif request.method == 'DELETE':
-        tempId = request.headers['tempId']
-
-        cursor = connection.cursor()
-
-        cursor.execute("DELETE FROM templates WHERE id = ?", [tempId])
-        cursor.execute("DELETE FROM submissions WHERE template_id = ?", [tempId])
-        connection.commit()
-        connection.close()
-
-        return 'Success'
+        return '1'
 
 
-@app.route('/api/submissions', methods=['GET', 'POST', 'DELETE'])
+@app.route('/api/submissions', methods=['GET', 'POST'])
 def submission():
     try:
         connection = connect(database)
@@ -106,12 +95,14 @@ def submission():
 
 @app.route('/OCR', methods=['POST'])
 def ocr():
-    picture = request.form['b64']
-    fileName = request.form['fileName']
-
-    return dumps(convert_detect(picture, fileName, True))
+    print(request.values)
+    picture = request.values['b64']
+    fileName = request.values['fileName']
+    
+    return dumps(convert_detect(picture.encode(), fileName, True))
 
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug = True)
+
