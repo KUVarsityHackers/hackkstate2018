@@ -20,12 +20,13 @@ export class SubmissionsService {
 
   postSubmission(sub: Submission){
       let body = {
-        template_id: sub.templateID,
+        tempId: sub.templateID + 1,
         submission_name: sub.name,
         submission_content: sub.code
 
       }
-      return this.http.post("http://photocode.net:8080/api/submissions", body);
+      let response = this.http.post<number>("http://photocode.net:8080/api/submissions", body);
+      return response;
   }
 
   getCodeResponse(Submission){
