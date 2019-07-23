@@ -1,4 +1,4 @@
 # hackkstate2018
 photoCode
-View the devpost: https://devpost.com/software/photocode
+View the devpost for more info: https://devpost.com/software/photocode
 
